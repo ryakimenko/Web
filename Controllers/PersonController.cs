@@ -16,39 +16,84 @@ namespace Web.Controllers
     {
         // GET: api/<PersonController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<Person> Get()
         {
-            return new string[] { "value1", "value2" };
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                return db.Person.ToArray();
+            }
         }
 
         // GET api/<PersonController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public Person Get(int id)
         {
-            return "value";
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                return db.Person.Find(id);
+            }
         }
 
         // POST api/<PersonController>
         [HttpPost]
-        public void Post([FromBody] Person person)
+        public ActionResult Post([FromBody] PersonModel personModel)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                db.Persons.Add(person);
+                
+                db.Person.Add(new Person(personModel));
                 db.SaveChanges();
+                return Ok("Created");
             }
         }
 
         // PUT api/<PersonController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut]
+        public ActionResult Put([FromBody] Person person)
         {
+            using (ApplicationContext db = new ApplicationContext())
+            { 
+                var FoundPerson = db.Person.Find(person.Id);
+                if (FoundPerson != null) {
+               
+                    db.Person.Update(person);
+                    db.SaveChanges();
+                    return Ok("Updated");
+                }
+                else
+                {
+                    db.Person.Add(new Person
+                    {
+                    FirstName = person.FirstName,
+                    MiddleName = person.MiddleName,
+                    LastName = person.LastName,
+                    Email = person.Email
+                });
+                    db.SaveChanges();
+                    return Ok("Created");
+                }
+            }
         }
 
         // DELETE api/<PersonController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public ActionResult Delete(int id)
         {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                var FoundPerson = db.Person.Find(id);
+                if(FoundPerson == null)
+                {
+                    return BadRequest("No person with that Id");
+
+                }
+                else
+                {
+                    db.Person.Remove(FoundPerson);
+                    db.SaveChanges();
+                    return Ok("Deleted");
+                }
+            }
         }
     }
 }

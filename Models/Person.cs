@@ -12,8 +12,8 @@ namespace Web.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
-        [Required]
+            
+        [Required]  
         public string FirstName { get; set; }
 
         public string? MiddleName { get; set; }
@@ -24,5 +24,17 @@ namespace Web.Models
         [Required]
         public string Email { get; set; }
 
+        public Person(PersonModel model)
+        {
+            this.FirstName = model.FirstName;
+            this.MiddleName = model.MiddleName;
+            this.LastName = model.LastName;
+            this.Email = model.Email;
+        }
+
+        public Person()
+        {
+
+        }
     }
 }
